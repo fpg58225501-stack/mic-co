@@ -1,0 +1,1530 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Resposta Cardíaca ao Exercício</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    font-family:Arial, Helvetica, sans-serif;
+    background:#f3f6fb;
+    color:#243147;
+}
+
+/* =====================================================
+   TOPO
+===================================================== */
+
+.hero{
+    position:relative;
+    min-height:360px;
+    background:
+        radial-gradient(circle at 15% 20%, rgba(255,255,255,.12), transparent 30%),
+        linear-gradient(135deg,#74142c,#b82449,#e14d70);
+    color:white;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+    padding:40px 20px;
+}
+
+.logo-gge{
+    position:absolute;
+    top:18px;
+    right:22px;
+    width:105px;
+    max-height:75px;
+    object-fit:contain;
+    background:white;
+    padding:7px;
+    border-radius:12px;
+    box-shadow:0 5px 18px rgba(0,0,0,.18);
+}
+
+.hero-content{
+    width:min(1050px,94%);
+    text-align:center;
+}
+
+.heart{
+    font-size:54px;
+    animation:heartbeat 1.05s infinite;
+}
+
+@keyframes heartbeat{
+    0%{transform:scale(1);}
+    15%{transform:scale(1.17);}
+    28%{transform:scale(1);}
+    43%{transform:scale(1.11);}
+    58%{transform:scale(1);}
+}
+
+.hero h1{
+    margin:8px 0;
+    font-size:35px;
+}
+
+.hero p{
+    max-width:760px;
+    margin:0 auto 20px;
+    opacity:.95;
+    line-height:1.5;
+}
+
+/* =====================================================
+   ECG
+===================================================== */
+
+.ecg-box{
+    position:relative;
+    width:min(780px,96%);
+    height:100px;
+    margin:18px auto 0;
+    background:rgba(0,0,0,.18);
+    border:1px solid rgba(255,255,255,.24);
+    border-radius:18px;
+    overflow:hidden;
+}
+
+.ecg-grid{
+    position:absolute;
+    inset:0;
+    background-image:
+        linear-gradient(rgba(255,255,255,.08) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(255,255,255,.08) 1px,transparent 1px);
+    background-size:20px 20px;
+}
+
+.ecg-svg{
+    position:absolute;
+    top:0;
+    left:0;
+    width:200%;
+    height:100%;
+    animation:ecgMove 4s linear infinite;
+}
+
+.ecg-line{
+    fill:none;
+    stroke:white;
+    stroke-width:3;
+    filter:drop-shadow(0 0 5px rgba(255,255,255,.55));
+}
+
+@keyframes ecgMove{
+    from{transform:translateX(0);}
+    to{transform:translateX(-50%);}
+}
+
+/* =====================================================
+   CONTEÚDO
+===================================================== */
+
+.container{
+    width:min(1120px,94%);
+    margin:30px auto;
+}
+
+.card{
+    background:white;
+    border-radius:20px;
+    padding:26px;
+    margin-bottom:24px;
+    box-shadow:0 10px 30px rgba(36,49,71,.10);
+}
+
+.card h2{
+    margin-top:0;
+    color:#b6234b;
+}
+
+/* =====================================================
+   ENTRADA DOS DADOS
+===================================================== */
+
+.measurements{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:18px;
+}
+
+.measure{
+    border:1px solid #e3e7ef;
+    background:linear-gradient(145deg,#fff,#f7f9fc);
+    border-radius:18px;
+    padding:22px;
+    text-align:center;
+    transition:.2s;
+}
+
+.measure:hover{
+    transform:translateY(-3px);
+    box-shadow:0 10px 20px rgba(0,0,0,.07);
+}
+
+.measure .icon{
+    font-size:40px;
+}
+
+.measure h3{
+    margin:8px 0;
+}
+
+.measure p{
+    color:#697387;
+    font-size:14px;
+    min-height:42px;
+}
+
+.measure input{
+    width:100%;
+    padding:15px;
+    font-size:24px;
+    text-align:center;
+    border:2px solid #dce1ea;
+    border-radius:13px;
+    outline:none;
+}
+
+.measure input:focus{
+    border-color:#d43b63;
+    box-shadow:0 0 0 4px rgba(212,59,99,.10);
+}
+
+.bpm{
+    display:block;
+    margin-top:7px;
+    font-size:13px;
+    color:#778094;
+}
+
+/* =====================================================
+   BOTÕES
+===================================================== */
+
+.buttons{
+    display:flex;
+    justify-content:center;
+    flex-wrap:wrap;
+    gap:12px;
+    margin-top:26px;
+}
+
+button{
+    border:none;
+    border-radius:13px;
+    padding:15px 24px;
+    font-size:16px;
+    font-weight:bold;
+    cursor:pointer;
+    transition:.2s;
+}
+
+.btn-main{
+    background:linear-gradient(135deg,#bd234b,#e24a6d);
+    color:white;
+    box-shadow:0 8px 20px rgba(194,36,77,.25);
+}
+
+.btn-main:hover{
+    transform:translateY(-2px);
+}
+
+.btn-reset{
+    background:#e9edf4;
+    color:#3c465b;
+}
+
+.btn-reset:hover{
+    background:#dde2eb;
+}
+
+/* =====================================================
+   RESULTADOS
+===================================================== */
+
+#resultados{
+    display:none;
+}
+
+.medidas-resumo{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin:18px 0 22px;
+}
+
+.pill{
+    flex:1;
+    min-width:180px;
+    background:#eef2f7;
+    padding:12px;
+    border-radius:30px;
+    text-align:center;
+    font-weight:bold;
+}
+
+.resultados-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:15px;
+}
+
+.resultado{
+    text-align:center;
+    padding:20px 12px;
+    border-radius:17px;
+    background:#f7f9fc;
+    border:1px solid #e1e5ed;
+}
+
+.resultado-titulo{
+    color:#667085;
+    font-size:13px;
+    min-height:38px;
+}
+
+.resultado-valor{
+    color:#bd234b;
+    font-size:31px;
+    font-weight:bold;
+    margin-top:8px;
+}
+
+.resultado-unidade{
+    color:#7a8394;
+    font-size:12px;
+}
+
+/* =====================================================
+   AVALIAÇÃO DIDÁTICA
+===================================================== */
+
+.avaliacao-card{
+    margin-top:25px;
+    border-radius:20px;
+    overflow:hidden;
+    border:1px solid #e2e6ee;
+}
+
+.avaliacao-topo{
+    padding:18px 22px;
+    color:white;
+    font-size:21px;
+    font-weight:bold;
+}
+
+.avaliacao-corpo{
+    padding:22px;
+    background:white;
+}
+
+.avaliacao-corpo p{
+    margin:0;
+    line-height:1.65;
+}
+
+.avaliacao-extra{
+    margin-top:14px;
+    padding:15px;
+    border-radius:12px;
+    background:#f6f8fb;
+    line-height:1.55;
+}
+
+.verde{
+    background:#2f9e61;
+}
+
+.amarelo{
+    background:#d7a318;
+}
+
+.laranja{
+    background:#e17825;
+}
+
+.vermelho{
+    background:#c63b3b;
+}
+
+/* =====================================================
+   GRÁFICO
+===================================================== */
+
+.grafico-area{
+    margin-top:25px;
+}
+
+canvas{
+    width:100%;
+    height:380px;
+    background:white;
+    border-radius:15px;
+}
+
+/* =====================================================
+   INTERPRETAÇÃO
+===================================================== */
+
+.interpretacao{
+    margin-top:25px;
+    border-radius:18px;
+    padding:22px;
+    background:linear-gradient(135deg,#fff4f7,#fff);
+    border-left:6px solid #d43b63;
+}
+
+.interpretacao h3{
+    margin-top:0;
+    color:#b6234b;
+}
+
+.interpretacao p{
+    line-height:1.65;
+}
+
+/* =====================================================
+   AVISO
+===================================================== */
+
+.aviso{
+    background:#fff7df;
+    border-left:5px solid #e2a82b;
+    padding:18px;
+    border-radius:13px;
+    line-height:1.5;
+    font-size:14px;
+}
+
+footer{
+    text-align:center;
+    padding:30px;
+    color:#768095;
+    font-size:13px;
+}
+
+/* =====================================================
+   RESPONSIVO
+===================================================== */
+
+@media(max-width:850px){
+
+    .measurements{
+        grid-template-columns:1fr;
+    }
+
+    .resultados-grid{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .hero h1{
+        font-size:27px;
+    }
+
+    .logo-gge{
+        width:82px;
+    }
+
+}
+
+@media(max-width:500px){
+
+    .resultados-grid{
+        grid-template-columns:1fr;
+    }
+
+    .hero{
+        padding-top:90px;
+    }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<section class="hero">
+
+<img
+src="logo-gge.png"
+alt="Logo GGE"
+class="logo-gge"
+>
+
+<div class="hero-content">
+
+<div class="heart">❤️</div>
+
+<h1>Monitoramento da Resposta Cardíaca</h1>
+
+<p>
+Compare a frequência cardíaca em repouso, imediatamente após o exercício
+e durante o primeiro minuto de recuperação.
+</p>
+
+<div class="ecg-box">
+
+<div class="ecg-grid"></div>
+
+<svg class="ecg-svg"
+viewBox="0 0 1200 100"
+preserveAspectRatio="none">
+
+<polyline
+class="ecg-line"
+points="
+0,55 80,55 100,52 115,57 135,55
+160,55 175,45 185,70 195,20 208,82 220,55
+270,55 330,55 350,52 365,57 385,55
+410,55 425,45 435,70 445,20 458,82 470,55
+520,55 580,55 600,52 615,57 635,55
+660,55 675,45 685,70 695,20 708,82 720,55
+770,55 830,55 850,52 865,57 885,55
+910,55 925,45 935,70 945,20 958,82 970,55
+1020,55 1080,55 1100,52 1115,57 1135,55
+1160,55 1175,45 1185,70 1195,20 1200,55
+"
+/>
+
+</svg>
+
+</div>
+
+</div>
+
+</section>
+
+
+<div class="container">
+
+<div class="card">
+
+<h2>📋 Dados da medição</h2>
+
+<p>
+Digite os três valores registrados pelo monitor de frequência cardíaca.
+</p>
+
+<div class="measurements">
+
+<div class="measure">
+
+<div class="icon">🪑</div>
+
+<h3>Repouso</h3>
+
+<p>
+Frequência cardíaca registrada antes dos polichinelos.
+</p>
+
+<input
+id="repouso"
+type="number"
+placeholder="Ex.: 75"
+min="1"
+>
+
+<span class="bpm">
+batimentos por minuto
+</span>
+
+</div>
+
+
+<div class="measure">
+
+<div class="icon">🏃</div>
+
+<h3>Pós-exercício</h3>
+
+<p>
+Valor registrado imediatamente após o esforço.
+</p>
+
+<input
+id="pos"
+type="number"
+placeholder="Ex.: 120"
+min="1"
+>
+
+<span class="bpm">
+batimentos por minuto
+</span>
+
+</div>
+
+
+<div class="measure">
+
+<div class="icon">⏱️</div>
+
+<h3>Após 1 minuto</h3>
+
+<p>
+Valor registrado após o primeiro minuto de recuperação.
+</p>
+
+<input
+id="recuperacao"
+type="number"
+placeholder="Ex.: 90"
+min="1"
+>
+
+<span class="bpm">
+batimentos por minuto
+</span>
+
+</div>
+
+</div>
+
+
+<div class="buttons">
+
+<button
+class="btn-main"
+onclick="calcular()">
+
+❤️ ANALISAR RESULTADO
+
+</button>
+
+<button
+class="btn-reset"
+onclick="novoParticipante()">
+
+↻ NOVO PARTICIPANTE
+
+</button>
+
+</div>
+
+</div>
+
+
+<div class="card" id="resultados">
+
+<h2>📊 Resultado experimental</h2>
+
+<div class="medidas-resumo">
+
+<div class="pill" id="pillRepouso"></div>
+<div class="pill" id="pillPos"></div>
+<div class="pill" id="pillRecuperacao"></div>
+
+</div>
+
+
+<div class="resultados-grid">
+
+<div class="resultado">
+
+<div class="resultado-titulo">
+Aumento após o exercício
+</div>
+
+<div class="resultado-valor" id="aumento">
+--
+</div>
+
+<div class="resultado-unidade">
+BPM
+</div>
+
+</div>
+
+
+<div class="resultado">
+
+<div class="resultado-titulo">
+Aumento percentual
+</div>
+
+<div class="resultado-valor" id="aumentoPercentual">
+--
+</div>
+
+<div class="resultado-unidade">
+%
+</div>
+
+</div>
+
+
+<div class="resultado">
+
+<div class="resultado-titulo">
+Queda após 1 minuto
+</div>
+
+<div class="resultado-valor" id="reducao">
+--
+</div>
+
+<div class="resultado-unidade">
+BPM
+</div>
+
+</div>
+
+
+<div class="resultado">
+
+<div class="resultado-titulo">
+Retorno da elevação
+</div>
+
+<div class="resultado-valor" id="retorno">
+--
+</div>
+
+<div class="resultado-unidade">
+%
+</div>
+
+</div>
+
+</div>
+
+
+<!-- AVALIAÇÃO -->
+
+<div class="avaliacao-card">
+
+<div
+class="avaliacao-topo"
+id="avaliacaoTopo">
+Avaliação
+</div>
+
+<div class="avaliacao-corpo">
+
+<p id="avaliacaoTexto"></p>
+
+<div
+class="avaliacao-extra"
+id="avaliacaoExtra">
+</div>
+
+</div>
+
+</div>
+
+
+<!-- GRÁFICO -->
+
+<div class="grafico-area">
+
+<h2>
+📈 Evolução da frequência cardíaca
+</h2>
+
+<canvas
+id="grafico"
+width="950"
+height="380">
+</canvas>
+
+</div>
+
+
+<!-- INTERPRETAÇÃO -->
+
+<div class="interpretacao">
+
+<h3>
+🫀 O que aconteceu durante o experimento?
+</h3>
+
+<p id="textoInterpretacao"></p>
+
+</div>
+
+</div>
+
+
+<div class="aviso">
+
+<strong>⚠️ Atenção:</strong>
+
+A classificação apresentada é apenas uma interpretação didática do padrão
+observado durante o experimento. Ela não confirma que o coração está saudável,
+não identifica doença cardíaca e não substitui avaliação médica.
+
+</div>
+
+</div>
+
+
+<footer>
+
+Experimento educativo — Monitoramento da Frequência Cardíaca
+
+</footer>
+
+
+<script>
+
+/* =====================================================
+   CÁLCULO
+===================================================== */
+
+function calcular(){
+
+    const repouso =
+    Number(document.getElementById("repouso").value);
+
+    const pos =
+    Number(document.getElementById("pos").value);
+
+    const recuperacao =
+    Number(document.getElementById("recuperacao").value);
+
+
+    if(
+        repouso <= 0 ||
+        pos <= 0 ||
+        recuperacao <= 0
+    ){
+
+        alert(
+            "Digite corretamente os três valores medidos."
+        );
+
+        return;
+    }
+
+
+    const aumento =
+    pos - repouso;
+
+
+    const aumentoPercentual =
+    (aumento / repouso) * 100;
+
+
+    const reducao =
+    pos - recuperacao;
+
+
+    let retorno = 0;
+
+    if(aumento !== 0){
+
+        retorno =
+        (reducao / aumento) * 100;
+
+    }
+
+
+    document.getElementById("aumento").innerHTML =
+    formatar(aumento);
+
+
+    document.getElementById("aumentoPercentual").innerHTML =
+    aumentoPercentual.toFixed(1);
+
+
+    document.getElementById("reducao").innerHTML =
+    formatar(reducao);
+
+
+    document.getElementById("retorno").innerHTML =
+    retorno.toFixed(1);
+
+
+    document.getElementById("pillRepouso").innerHTML =
+    "🪑 Repouso: " + repouso + " BPM";
+
+
+    document.getElementById("pillPos").innerHTML =
+    "🏃 Pós: " + pos + " BPM";
+
+
+    document.getElementById("pillRecuperacao").innerHTML =
+    "⏱️ 1 min: " + recuperacao + " BPM";
+
+
+    criarAvaliacao(
+        repouso,
+        pos,
+        recuperacao,
+        aumento,
+        reducao
+    );
+
+
+    criarInterpretacao(
+        repouso,
+        pos,
+        recuperacao,
+        aumento,
+        aumentoPercentual,
+        reducao,
+        retorno
+    );
+
+
+    desenharGrafico(
+        repouso,
+        pos,
+        recuperacao
+    );
+
+
+    document.getElementById("resultados").style.display =
+    "block";
+
+
+    document.getElementById("resultados")
+    .scrollIntoView({
+        behavior:"smooth"
+    });
+
+}
+
+
+/* =====================================================
+   AVALIAÇÃO DIDÁTICA
+===================================================== */
+
+function criarAvaliacao(
+    repouso,
+    pos,
+    recuperacao,
+    aumento,
+    reducao
+){
+
+    const topo =
+    document.getElementById("avaliacaoTopo");
+
+    const texto =
+    document.getElementById("avaliacaoTexto");
+
+    const extra =
+    document.getElementById("avaliacaoExtra");
+
+
+    topo.className =
+    "avaliacao-topo";
+
+
+    /*
+    VERDE
+    Aumentou com exercício e caiu após 1 minuto.
+    */
+
+    if(
+        pos > repouso &&
+        recuperacao < pos
+    ){
+
+        topo.classList.add("verde");
+
+        topo.innerHTML =
+        "🟢 Resposta compatível com o esperado";
+
+
+        texto.innerHTML =
+        "A frequência cardíaca aumentou após o exercício e apresentou redução durante o primeiro minuto de recuperação. Esse é o comportamento geral esperado quando o organismo responde ao aumento da demanda provocado pelo esforço e começa a retornar ao estado de repouso.";
+
+
+        extra.innerHTML =
+        "<strong>Leitura didática:</strong> o sistema cardiovascular respondeu ao exercício e iniciou a recuperação após o término da atividade.";
+
+        return;
+    }
+
+
+    /*
+    LARANJA
+    Aumentou mas não caiu no primeiro minuto.
+    */
+
+    if(
+        pos > repouso &&
+        recuperacao >= pos
+    ){
+
+        topo.classList.add("laranja");
+
+        topo.innerHTML =
+        "🟠 Frequência ainda elevada após 1 minuto";
+
+
+        texto.innerHTML =
+        "A frequência cardíaca aumentou após o exercício, porém não apresentou redução no primeiro minuto de recuperação. Isso pode acontecer porque o participante ainda estava se recuperando, porque o esforço foi mais intenso ou porque a leitura do sensor não estava totalmente estabilizada.";
+
+
+        extra.innerHTML =
+        "<strong>Sugestão:</strong> deixe o participante descansar mais tempo e, se necessário, repita a medição. O resultado isolado não indica doença cardíaca.";
+
+        return;
+    }
+
+
+    /*
+    AMARELO
+    Não aumentou após o exercício.
+    */
+
+    if(
+        pos <= repouso &&
+        recuperacao <= pos
+    ){
+
+        topo.classList.add("amarelo");
+
+        topo.innerHTML =
+        "🟡 Resultado diferente do padrão esperado";
+
+
+        texto.innerHTML =
+        "A frequência cardíaca registrada imediatamente após o exercício não foi maior que a frequência em repouso. Em uma atividade como essa, normalmente se espera algum aumento após o esforço.";
+
+
+        extra.innerHTML =
+        "<strong>Primeiro passo:</strong> confira o posicionamento do dedo, espere o sensor estabilizar e repita a sequência antes de interpretar o resultado.";
+
+        return;
+    }
+
+
+    /*
+    VERMELHO
+    Sequência muito incoerente.
+    */
+
+    topo.classList.add("vermelho");
+
+    topo.innerHTML =
+    "🔴 Resultado requer conferência";
+
+
+    texto.innerHTML =
+    "A sequência registrada não acompanhou o comportamento esperado para este experimento. Isso não significa, por si só, que exista algo errado com o coração. Leituras instáveis, movimento do dedo, atraso entre o exercício e a medição ou posicionamento inadequado do sensor podem alterar os valores.";
+
+
+    extra.innerHTML =
+    "<strong>Atenção:</strong> repita a medição em condições adequadas. Se o participante estiver apresentando dor no peito, desmaio, tontura importante, falta de ar intensa ou mal-estar, a atividade deve ser interrompida.";
+
+}
+
+
+/* =====================================================
+   INTERPRETAÇÃO
+===================================================== */
+
+function criarInterpretacao(
+    repouso,
+    pos,
+    recuperacao,
+    aumento,
+    percentual,
+    reducao,
+    retorno
+){
+
+    let texto = "";
+
+
+    texto +=
+    "A frequência cardíaca em repouso foi de <strong>"
+    + repouso +
+    " BPM</strong>. ";
+
+
+    texto +=
+    "Após os polichinelos, o valor passou para <strong>"
+    + pos +
+    " BPM</strong>.";
+
+
+    if(aumento > 0){
+
+        texto +=
+        " Isso representa um aumento de <strong>"
+        + formatar(aumento)
+        + " BPM</strong>, equivalente a aproximadamente <strong>"
+        + percentual.toFixed(1)
+        + "%</strong>.";
+
+    }
+
+    else{
+
+        texto +=
+        " Nesse registro não foi observado aumento da frequência cardíaca após o esforço.";
+
+    }
+
+
+    texto += "<br><br>";
+
+
+    texto +=
+    "Após um minuto de recuperação, a frequência registrada foi de <strong>"
+    + recuperacao
+    + " BPM</strong>.";
+
+
+    if(reducao > 0){
+
+        texto +=
+        " Houve uma redução de <strong>"
+        + formatar(reducao)
+        + " BPM</strong> em relação ao valor pós-exercício.";
+
+
+        if(aumento > 0){
+
+            texto +=
+            " Essa redução corresponde a aproximadamente <strong>"
+            + retorno.toFixed(1)
+            + "%</strong> da elevação provocada pelo esforço.";
+
+        }
+
+    }
+
+    else{
+
+        texto +=
+        " Não foi observada redução da frequência cardíaca no primeiro minuto.";
+
+    }
+
+
+    document.getElementById(
+        "textoInterpretacao"
+    ).innerHTML =
+    texto;
+
+}
+
+
+/* =====================================================
+   GRÁFICO
+===================================================== */
+
+function desenharGrafico(
+    repouso,
+    pos,
+    recuperacao
+){
+
+    const canvas =
+    document.getElementById("grafico");
+
+    const ctx =
+    canvas.getContext("2d");
+
+
+    const largura =
+    canvas.width;
+
+    const altura =
+    canvas.height;
+
+
+    ctx.clearRect(
+        0,
+        0,
+        largura,
+        altura
+    );
+
+
+    ctx.fillStyle =
+    "#ffffff";
+
+    ctx.fillRect(
+        0,
+        0,
+        largura,
+        altura
+    );
+
+
+    const margemEsquerda = 80;
+    const margemDireita = 50;
+    const margemSuperior = 45;
+    const margemInferior = 75;
+
+
+    const valores = [
+        repouso,
+        pos,
+        recuperacao
+    ];
+
+
+    let min =
+    Math.min(...valores);
+
+    let max =
+    Math.max(...valores);
+
+
+    min =
+    Math.max(
+        0,
+        Math.floor((min - 20) / 10) * 10
+    );
+
+
+    max =
+    Math.ceil((max + 20) / 10) * 10;
+
+
+    if(max === min){
+        max += 20;
+    }
+
+
+    function calcularY(valor){
+
+        return margemSuperior +
+        (max - valor) *
+        (
+            altura -
+            margemSuperior -
+            margemInferior
+        )
+        /
+        (max - min);
+
+    }
+
+
+    const xs = [
+
+        margemEsquerda + 90,
+
+        largura / 2,
+
+        largura -
+        margemDireita -
+        90
+
+    ];
+
+
+    ctx.strokeStyle =
+    "#dce1e9";
+
+    ctx.lineWidth = 1;
+
+    ctx.font =
+    "13px Arial";
+
+    ctx.fillStyle =
+    "#6f7889";
+
+
+    const divisoes = 5;
+
+
+    for(
+        let i = 0;
+        i <= divisoes;
+        i++
+    ){
+
+        const valor =
+        min +
+        (
+            (max - min) *
+            i /
+            divisoes
+        );
+
+
+        const yy =
+        calcularY(valor);
+
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            margemEsquerda,
+            yy
+        );
+
+        ctx.lineTo(
+            largura -
+            margemDireita,
+            yy
+        );
+
+        ctx.stroke();
+
+
+        ctx.fillText(
+            Math.round(valor),
+            30,
+            yy + 4
+        );
+
+    }
+
+
+    ctx.strokeStyle =
+    "#586174";
+
+    ctx.lineWidth = 2;
+
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        margemEsquerda,
+        margemSuperior
+    );
+
+    ctx.lineTo(
+        margemEsquerda,
+        altura -
+        margemInferior
+    );
+
+    ctx.lineTo(
+        largura -
+        margemDireita,
+        altura -
+        margemInferior
+    );
+
+    ctx.stroke();
+
+
+    ctx.strokeStyle =
+    "#cf3158";
+
+    ctx.lineWidth = 5;
+
+    ctx.lineJoin =
+    "round";
+
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        xs[0],
+        calcularY(repouso)
+    );
+
+    ctx.lineTo(
+        xs[1],
+        calcularY(pos)
+    );
+
+    ctx.lineTo(
+        xs[2],
+        calcularY(recuperacao)
+    );
+
+    ctx.stroke();
+
+
+    const pontos = [
+
+        {
+            x:xs[0],
+            valor:repouso,
+            nome:"REPOUSO"
+        },
+
+        {
+            x:xs[1],
+            valor:pos,
+            nome:"PÓS"
+        },
+
+        {
+            x:xs[2],
+            valor:recuperacao,
+            nome:"1 MINUTO"
+        }
+
+    ];
+
+
+    pontos.forEach(
+        ponto => {
+
+            const yy =
+            calcularY(ponto.valor);
+
+
+            ctx.beginPath();
+
+            ctx.fillStyle =
+            "#ffffff";
+
+            ctx.strokeStyle =
+            "#cf3158";
+
+            ctx.lineWidth = 5;
+
+
+            ctx.arc(
+                ponto.x,
+                yy,
+                10,
+                0,
+                Math.PI * 2
+            );
+
+
+            ctx.fill();
+            ctx.stroke();
+
+
+            ctx.fillStyle =
+            "#273348";
+
+            ctx.font =
+            "bold 18px Arial";
+
+            ctx.textAlign =
+            "center";
+
+
+            ctx.fillText(
+                ponto.valor + " BPM",
+                ponto.x,
+                yy - 23
+            );
+
+
+            ctx.font =
+            "bold 13px Arial";
+
+
+            ctx.fillText(
+                ponto.nome,
+                ponto.x,
+                altura -
+                margemInferior +
+                36
+            );
+
+        }
+    );
+
+
+    ctx.textAlign =
+    "left";
+
+
+    ctx.save();
+
+    ctx.translate(
+        20,
+        altura / 2
+    );
+
+    ctx.rotate(
+        -Math.PI / 2
+    );
+
+    ctx.font =
+    "bold 14px Arial";
+
+    ctx.fillStyle =
+    "#586174";
+
+    ctx.textAlign =
+    "center";
+
+    ctx.fillText(
+        "Frequência cardíaca (BPM)",
+        0,
+        0
+    );
+
+    ctx.restore();
+
+}
+
+
+/* =====================================================
+   FORMATAR
+===================================================== */
+
+function formatar(valor){
+
+    if(Number.isInteger(valor)){
+        return valor;
+    }
+
+    return valor.toFixed(1);
+
+}
+
+
+/* =====================================================
+   NOVO PARTICIPANTE
+===================================================== */
+
+function novoParticipante(){
+
+    document.getElementById(
+        "repouso"
+    ).value = "";
+
+
+    document.getElementById(
+        "pos"
+    ).value = "";
+
+
+    document.getElementById(
+        "recuperacao"
+    ).value = "";
+
+
+    document.getElementById(
+        "resultados"
+    ).style.display =
+    "none";
+
+
+    window.scrollTo({
+        top:0,
+        behavior:"smooth"
+    });
+
+
+    setTimeout(
+        () => {
+
+            document.getElementById(
+                "repouso"
+            ).focus();
+
+        },
+        500
+    );
+
+}
+
+</script>
+
+</body>
+</html>
