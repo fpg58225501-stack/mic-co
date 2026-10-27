@@ -1,0 +1,1009 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laboratório de Percepção Auditiva</title>
+
+<style>
+:root {
+  --navy:#0b315d;
+  --blue:#147cb9;
+  --green:#16866b;
+  --orange:#e99536;
+  --red:#c84c4c;
+  --bg:#f2f6fa;
+  --muted:#64798b;
+}
+
+* { box-sizing:border-box; }
+
+body {
+  margin:0;
+  font-family:Arial,Helvetica,sans-serif;
+  background:var(--bg);
+  color:#20394e;
+}
+
+header {
+  background:linear-gradient(115deg,#092c55,#147cb9);
+  color:white;
+  text-align:center;
+  padding:30px 16px;
+}
+
+header h1 {
+  margin:0 0 8px;
+  font-size:30px;
+}
+
+header p {
+  margin:0;
+  opacity:.9;
+}
+
+main {
+  max-width:1050px;
+  margin:24px auto;
+  padding:0 16px;
+}
+
+.card {
+  background:white;
+  border-radius:18px;
+  padding:25px;
+  margin-bottom:20px;
+  box-shadow:0 6px 24px #123f6010;
+}
+
+h2 {
+  color:var(--navy);
+  margin:0 0 16px;
+}
+
+h3 { color:var(--navy); }
+
+p { line-height:1.6; }
+
+.info {
+  padding:15px 18px;
+  background:#eef6fc;
+  border-left:5px solid var(--blue);
+  border-radius:11px;
+}
+
+.notice {
+  background:#fff8eb;
+  border-left:5px solid var(--orange);
+  padding:15px 18px;
+  border-radius:11px;
+  margin-top:17px;
+  font-size:14px;
+}
+
+.frequency {
+  font-size:clamp(48px,9vw,88px);
+  font-weight:800;
+  color:var(--navy);
+  text-align:center;
+  margin:25px 0 8px;
+  font-variant-numeric:tabular-nums;
+}
+
+.center { text-align:center; }
+.muted { color:var(--muted); }
+
+.wavebox {
+  height:160px;
+  background:linear-gradient(180deg,#f4faff,#fff);
+  border:1px solid #dfebf3;
+  border-radius:15px;
+  overflow:hidden;
+  margin:22px 0;
+}
+
+canvas {
+  display:block;
+  width:100%;
+  height:100%;
+}
+
+.track {
+  height:18px;
+  background:#e3edf3;
+  border-radius:20px;
+  overflow:hidden;
+}
+
+.fill {
+  height:100%;
+  width:0;
+  background:linear-gradient(
+    90deg,#147cb9,#18b69b,#e99536
+  );
+}
+
+.scale {
+  display:flex;
+  justify-content:space-between;
+  margin-top:9px;
+  font-size:12px;
+  color:var(--muted);
+}
+
+.buttons {
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:11px;
+  margin:25px 0;
+}
+
+button {
+  border:0;
+  border-radius:12px;
+  padding:16px 20px;
+  font-size:15px;
+  font-weight:bold;
+  cursor:pointer;
+  color:white;
+  background:var(--navy);
+}
+
+button:disabled {
+  opacity:.4;
+  cursor:not-allowed;
+}
+
+.green { background:var(--green); }
+.orange { background:var(--orange); }
+.red { background:var(--red); }
+
+.volume {
+  padding:16px;
+  background:#f5f9fc;
+  border-radius:12px;
+}
+
+.volume input {
+  width:100%;
+  accent-color:var(--blue);
+}
+
+.status {
+  padding:16px;
+  text-align:center;
+  background:#edf6fc;
+  border-radius:12px;
+  font-weight:bold;
+  color:var(--navy);
+  margin-top:18px;
+}
+
+.result { display:none; }
+
+.metrics {
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:13px;
+}
+
+.metric {
+  padding:20px;
+  background:#f2f8fc;
+  border-radius:13px;
+  text-align:center;
+}
+
+.metric span {
+  display:block;
+  font-size:13px;
+  color:var(--muted);
+}
+
+.metric strong {
+  display:block;
+  font-size:clamp(20px,3vw,29px);
+  color:var(--navy);
+  margin-top:10px;
+}
+
+.analysis {
+  margin-top:22px;
+  padding:20px;
+  background:#f6fafd;
+  border:1px solid #dcebf4;
+  border-radius:14px;
+}
+
+.region {
+  margin:19px 0;
+}
+
+.region-header {
+  display:flex;
+  justify-content:space-between;
+  font-weight:bold;
+  margin-bottom:9px;
+}
+
+.meter {
+  height:14px;
+  background:#e1eaf0;
+  border-radius:20px;
+  overflow:hidden;
+}
+
+.meter div {
+  width:0;
+  height:100%;
+  background:linear-gradient(90deg,#1593cb,#16b797);
+}
+
+.region p {
+  font-size:14px;
+  margin:9px 0 0;
+  color:#506c80;
+}
+
+.final-diagnosis {
+  margin-top:25px;
+  padding:25px;
+  border-radius:17px;
+  background:linear-gradient(125deg,#0a315e,#116fa5);
+  color:white;
+}
+
+.final-diagnosis .eyebrow {
+  font-size:13px;
+  letter-spacing:1.4px;
+  font-weight:bold;
+  opacity:.85;
+}
+
+.final-diagnosis h3 {
+  color:white;
+  font-size:clamp(21px,3.5vw,30px);
+  margin:15px 0;
+}
+
+.final-diagnosis p {
+  line-height:1.75;
+  font-size:16px;
+}
+
+.final-diagnosis .tag {
+  display:inline-block;
+  padding:9px 13px;
+  border-radius:8px;
+  background:#ffffff25;
+  font-size:13px;
+  margin-top:8px;
+}
+
+footer {
+  padding:10px 15px 30px;
+  text-align:center;
+  color:var(--muted);
+  font-size:13px;
+}
+
+@media(max-width:650px) {
+  .metrics { grid-template-columns:1fr; }
+  .card { padding:18px; }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>Laboratório de Percepção Auditiva</h1>
+  <p>Teste interativo de frequências sonoras</p>
+</header>
+
+<main>
+
+<section class="card">
+  <h2>Instruções do experimento</h2>
+
+  <div class="info">
+    <p><b>1.</b> Utilize fones de ouvido em volume baixo e confortável.</p>
+    <p><b>2.</b> Clique em <b>INICIAR TESTE</b>.</p>
+    <p><b>3.</b> Pressione <b>ENTER</b> quando começar a ouvir o som.</p>
+    <p><b>4.</b> Pressione <b>ENTER novamente</b> quando deixar de ouvir.</p>
+    <p><b>5.</b> Consulte a análise e o diagnóstico geral simulado.</p>
+  </div>
+
+  <div class="notice">
+    <b>Atenção:</b> não aumente o volume para tentar
+    ouvir frequências que desapareceram.
+    O resultado depende também dos fones,
+    do computador e das condições do ambiente.
+  </div>
+</section>
+
+<section class="card">
+  <h2>Varredura de frequências</h2>
+
+  <div class="frequency" id="frequency">20 Hz</div>
+
+  <p class="center muted" id="phaseLabel">
+    Aguardando início
+  </p>
+
+  <div class="wavebox">
+    <canvas id="wave"></canvas>
+  </div>
+
+  <div class="track">
+    <div class="fill" id="progress"></div>
+  </div>
+
+  <div class="scale">
+    <span>20 Hz</span>
+    <span>200 Hz</span>
+    <span>2.000 Hz</span>
+    <span>20.000 Hz</span>
+  </div>
+
+  <div class="buttons">
+    <button class="green" id="start">
+      ▶ INICIAR TESTE
+    </button>
+
+    <button class="orange" id="mark" disabled>
+      ENTER — COMECEI A OUVIR
+    </button>
+
+    <button class="red" id="stop" disabled>
+      ■ INTERROMPER
+    </button>
+
+    <button id="reset">
+      ↻ REINICIAR
+    </button>
+  </div>
+
+  <div class="volume">
+    <label>
+      Volume inicial:
+      <b id="volumeValue">15%</b>
+    </label>
+
+    <input
+      id="volume"
+      type="range"
+      min="0"
+      max="25"
+      value="15"
+    >
+
+    <p class="muted" style="font-size:13px;margin-bottom:0">
+      Ajuste antes do teste. O volume não é calibrado
+      e permanece fixo durante a varredura.
+    </p>
+  </div>
+
+  <div class="status" id="status">
+    Pronto para começar.
+  </div>
+</section>
+
+<section class="card result" id="result">
+
+  <h2>Resultado da avaliação</h2>
+
+  <div class="metrics">
+    <div class="metric">
+      <span>Limite inferior percebido</span>
+      <strong id="lowerValue">—</strong>
+    </div>
+
+    <div class="metric">
+      <span>Limite superior percebido</span>
+      <strong id="upperValue">—</strong>
+    </div>
+
+    <div class="metric">
+      <span>Extensão da faixa percebida</span>
+      <strong id="rangeValue">—</strong>
+    </div>
+  </div>
+
+  <div class="analysis">
+    <h3>Análise por regiões de frequência</h3>
+
+    <div class="region">
+      <div class="region-header">
+        <span>Graves — 20 a 250 Hz</span>
+        <span id="bassPct">0%</span>
+      </div>
+      <div class="meter">
+        <div id="bassBar"></div>
+      </div>
+      <p id="bassText"></p>
+    </div>
+
+    <div class="region">
+      <div class="region-header">
+        <span>Médias — 250 a 2.000 Hz</span>
+        <span id="midPct">0%</span>
+      </div>
+      <div class="meter">
+        <div id="midBar"></div>
+      </div>
+      <p id="midText"></p>
+    </div>
+
+    <div class="region">
+      <div class="region-header">
+        <span>Agudas — 2.000 a 20.000 Hz</span>
+        <span id="treblePct">0%</span>
+      </div>
+      <div class="meter">
+        <div id="trebleBar"></div>
+      </div>
+      <p id="trebleText"></p>
+    </div>
+  </div>
+
+  <div class="final-diagnosis">
+    <div class="eyebrow">
+      DIAGNÓSTICO GERAL SIMULADO
+    </div>
+
+    <h3 id="diagnosisTitle">—</h3>
+
+    <p id="diagnosisText"></p>
+
+    <p id="diagnosisConclusion"></p>
+
+    <div class="tag">
+      Classificação didática por frequência
+    </div>
+  </div>
+
+  <div class="notice">
+    <b>Nota científica:</b> o diagnóstico apresentado
+    é simulado e descreve a extensão da faixa
+    de frequências relatada pelo participante.
+    Não identifica clinicamente perda auditiva,
+    não mede limiares auditivos e não avalia
+    individualmente as frequências intermediárias.
+  </div>
+
+</section>
+
+</main>
+
+<footer>
+  Laboratório virtual de Acústica Física — Fonoaudiologia
+</footer>
+
+<script>
+"use strict";
+
+const MIN = 20;
+const MAX = 20000;
+const DURATION = 60000;
+
+const $ = id => document.getElementById(id);
+
+let audioContext = null;
+let oscillator = null;
+let gainNode = null;
+
+let running = false;
+let stage = 0;
+
+let lower = null;
+let upper = null;
+
+let currentFrequency = MIN;
+let startTime = 0;
+let visualTime = 0;
+
+const canvas = $("wave");
+const g = canvas.getContext("2d");
+
+function hz(value) {
+  return Math.round(value).toLocaleString("pt-BR") + " Hz";
+}
+
+function frequencyAt(progress) {
+  return MIN * Math.pow(MAX / MIN, progress);
+}
+
+function logPosition(freq) {
+  return Math.log(freq / MIN) / Math.log(MAX / MIN);
+}
+
+function updateFrequency(progress) {
+  const p = Math.max(0, Math.min(1, progress));
+
+  currentFrequency = frequencyAt(p);
+
+  $("frequency").textContent = hz(currentFrequency);
+  $("progress").style.width = (p * 100) + "%";
+
+  if (oscillator && audioContext) {
+    oscillator.frequency.setTargetAtTime(
+      currentFrequency,
+      audioContext.currentTime,
+      0.02
+    );
+  }
+}
+
+function resizeCanvas() {
+  const rect = canvas.getBoundingClientRect();
+  const ratio = Math.min(window.devicePixelRatio || 1, 2);
+
+  canvas.width = Math.round(rect.width * ratio);
+  canvas.height = Math.round(rect.height * ratio);
+
+  g.setTransform(ratio, 0, 0, ratio, 0, 0);
+}
+
+function drawWave() {
+  const width = canvas.clientWidth;
+  const height = canvas.clientHeight;
+
+  g.clearRect(0, 0, width, height);
+
+  g.strokeStyle = "#d6e7f1";
+  g.lineWidth = 1;
+
+  g.beginPath();
+  g.moveTo(0, height / 2);
+  g.lineTo(width, height / 2);
+  g.stroke();
+
+  const cycles = 2 + 12 * logPosition(currentFrequency);
+  const amplitude = running ? 42 : 13;
+
+  g.beginPath();
+
+  for (let x = 0; x <= width; x += 2) {
+    const y = height / 2 +
+      Math.sin(
+        (x / width) * cycles * 2 * Math.PI - visualTime
+      ) * amplitude;
+
+    if (x === 0) {
+      g.moveTo(x, y);
+    } else {
+      g.lineTo(x, y);
+    }
+  }
+
+  g.strokeStyle = "#1689c7";
+  g.lineWidth = 3;
+  g.stroke();
+
+  if (running) {
+    visualTime += 0.06;
+  }
+}
+
+async function startSound() {
+  const AudioClass =
+    window.AudioContext || window.webkitAudioContext;
+
+  if (!AudioClass) {
+    throw new Error("Áudio indisponível");
+  }
+
+  audioContext = new AudioClass();
+  await audioContext.resume();
+
+  oscillator = audioContext.createOscillator();
+  gainNode = audioContext.createGain();
+
+  oscillator.type = "sine";
+  oscillator.frequency.value = MIN;
+
+  gainNode.gain.value = 0;
+
+  oscillator.connect(gainNode);
+  gainNode.connect(audioContext.destination);
+
+  oscillator.start();
+
+  const volume = Number($("volume").value) / 100;
+
+  gainNode.gain.setTargetAtTime(
+    volume * 0.12,
+    audioContext.currentTime,
+    0.06
+  );
+}
+
+function stopSound() {
+  if (gainNode && audioContext) {
+    try {
+      gainNode.gain.setTargetAtTime(
+        0,
+        audioContext.currentTime,
+        0.01
+      );
+    } catch (error) {}
+  }
+
+  if (oscillator) {
+    try {
+      oscillator.stop();
+    } catch (error) {}
+
+    oscillator = null;
+  }
+
+  if (audioContext) {
+    const oldContext = audioContext;
+    audioContext = null;
+
+    oldContext.close().catch(() => {});
+  }
+
+  gainNode = null;
+}
+
+function updateButtons() {
+  $("start").disabled = running;
+  $("mark").disabled = !running;
+  $("stop").disabled = !running;
+  $("volume").disabled = running;
+
+  $("mark").textContent = stage === 0
+    ? "ENTER — COMECEI A OUVIR"
+    : "ENTER — PAREI DE OUVIR";
+}
+
+async function startTest() {
+  if (running) return;
+
+  lower = null;
+  upper = null;
+  stage = 0;
+  visualTime = 0;
+
+  updateFrequency(0);
+  $("result").style.display = "none";
+
+  try {
+    await startSound();
+  } catch (error) {
+    $("status").textContent =
+      "Não foi possível iniciar o áudio.";
+
+    stopSound();
+    return;
+  }
+
+  running = true;
+  startTime = performance.now();
+
+  $("phaseLabel").textContent =
+    "Procurando o limite inferior";
+
+  $("status").textContent =
+    "Pressione ENTER quando começar a ouvir.";
+
+  updateButtons();
+}
+
+function markFrequency() {
+  if (!running) return;
+
+  if (stage === 0) {
+    lower = currentFrequency;
+    stage = 1;
+
+    $("phaseLabel").textContent =
+      "Procurando o limite superior";
+
+    $("status").textContent =
+      "Pressione ENTER quando deixar de ouvir.";
+  } else {
+    upper = currentFrequency;
+    finishTest();
+  }
+
+  updateButtons();
+}
+
+function overlapPercent(a, b, low, high) {
+  const left = Math.max(a, low);
+  const right = Math.min(b, high);
+
+  if (right <= left) return 0;
+
+  return 100 *
+    Math.log(right / left) /
+    Math.log(b / a);
+}
+
+function analyzeRegion(
+  barId,
+  pctId,
+  textId,
+  a,
+  b,
+  name
+) {
+  const pct = overlapPercent(
+    a, b, lower, upper
+  );
+
+  $(barId).style.width = pct.toFixed(1) + "%";
+  $(pctId).textContent = Math.round(pct) + "%";
+
+  let description;
+
+  if (pct >= 95) {
+    description =
+      "O intervalo relatado abrange praticamente " +
+      "toda a região " + name + ".";
+  } else if (pct >= 50) {
+    description =
+      "O intervalo relatado abrange uma parte " +
+      "considerável da região " + name + ".";
+  } else if (pct > 0) {
+    description =
+      "O intervalo relatado abrange apenas " +
+      "parte da região " + name + ".";
+  } else {
+    description =
+      "A região " + name +
+      " ficou fora do intervalo relatado.";
+  }
+
+  $(textId).textContent = description;
+}
+
+function generalDiagnosis(low, high) {
+  // Critérios escolhidos apenas para a simulação.
+  // Não correspondem a limites clínicos.
+
+  const bassLimited = low > 100;
+  const trebleLimited = high < 12000;
+
+  if (!bassLimited && !trebleLimited) {
+    return {
+      title: "PERCEPÇÃO AUDITIVA AMPLA",
+      description:
+        "O participante relatou perceber uma faixa " +
+        "extensa de frequências, abrangendo graves, " +
+        "médias e agudas.",
+      conclusion:
+        "Conclusão geral: o intervalo registrado " +
+        "apresenta boa extensão de percepção nos " +
+        "dois extremos da faixa sonora, segundo " +
+        "os critérios didáticos deste simulador."
+    };
+  }
+
+  if (bassLimited && trebleLimited) {
+    return {
+      title:
+        "PERCEPÇÃO LIMITADA NOS GRAVES E AGUDOS",
+      description:
+        "O participante relatou início da percepção " +
+        "em frequência relativamente elevada e " +
+        "interrupção antes das frequências agudas " +
+        "mais altas.",
+      conclusion:
+        "Conclusão geral: a faixa registrada é " +
+        "mais estreita nos dois extremos, com " +
+        "maior concentração na região intermediária."
+    };
+  }
+
+  if (bassLimited) {
+    return {
+      title:
+        "PERCEPÇÃO LIMITADA NAS FREQUÊNCIAS GRAVES",
+      description:
+        "O participante relatou dificuldade de " +
+        "percepção no extremo inferior da faixa, " +
+        "mantendo uma extensão relativamente " +
+        "ampla nas frequências mais elevadas.",
+      conclusion:
+        "Conclusão geral: a principal limitação " +
+        "observada na varredura está no limite " +
+        "inferior de frequências."
+    };
+  }
+
+  return {
+    title:
+      "PERCEPÇÃO LIMITADA NAS FREQUÊNCIAS AGUDAS",
+    description:
+      "O participante relatou percepção de " +
+      "frequências graves e intermediárias, " +
+      "mas deixou de perceber o som antes " +
+      "das frequências agudas mais elevadas.",
+    conclusion:
+      "Conclusão geral: a principal limitação " +
+      "observada na varredura está no limite " +
+      "superior de frequências."
+  };
+}
+
+function showResult() {
+  $("lowerValue").textContent = hz(lower);
+  $("upperValue").textContent = hz(upper);
+
+  $("rangeValue").textContent =
+    hz(upper - lower);
+
+  analyzeRegion(
+    "bassBar",
+    "bassPct",
+    "bassText",
+    20,
+    250,
+    "grave"
+  );
+
+  analyzeRegion(
+    "midBar",
+    "midPct",
+    "midText",
+    250,
+    2000,
+    "média"
+  );
+
+  analyzeRegion(
+    "trebleBar",
+    "treblePct",
+    "trebleText",
+    2000,
+    20000,
+    "aguda"
+  );
+
+  const diagnosis = generalDiagnosis(lower, upper);
+
+  $("diagnosisTitle").textContent =
+    diagnosis.title;
+
+  $("diagnosisText").textContent =
+    diagnosis.description;
+
+  $("diagnosisConclusion").textContent =
+    diagnosis.conclusion;
+
+  $("result").style.display = "block";
+
+  $("result").scrollIntoView({
+    behavior: "smooth",
+    block: "start"
+  });
+}
+
+function finishTest() {
+  if (!running) return;
+
+  running = false;
+  stopSound();
+  updateButtons();
+
+  showResult();
+
+  $("phaseLabel").textContent =
+    "Varredura concluída";
+
+  $("status").textContent =
+    "Teste concluído. Consulte o resultado abaixo.";
+}
+
+function stopTest() {
+  running = false;
+  stopSound();
+  updateButtons();
+
+  $("phaseLabel").textContent =
+    "Varredura interrompida";
+}
+
+function resetTest() {
+  stopTest();
+
+  lower = null;
+  upper = null;
+  stage = 0;
+  visualTime = 0;
+
+  updateFrequency(0);
+
+  $("result").style.display = "none";
+
+  $("phaseLabel").textContent =
+    "Aguardando início";
+
+  $("status").textContent =
+    "Pronto para começar.";
+
+  updateButtons();
+}
+
+function animationLoop(now) {
+  if (running) {
+    const progress = Math.min(
+      1,
+      (now - startTime) / DURATION
+    );
+
+    updateFrequency(progress);
+
+    if (progress >= 1) {
+      if (stage === 1) {
+        upper = MAX;
+        finishTest();
+      } else {
+        stopTest();
+
+        $("status").textContent =
+          "Varredura encerrada sem registro " +
+          "de início da percepção.";
+      }
+    }
+  }
+
+  drawWave();
+  requestAnimationFrame(animationLoop);
+}
+
+$("start").addEventListener("click", startTest);
+
+$("mark").addEventListener(
+  "click",
+  markFrequency
+);
+
+$("stop").addEventListener("click", () => {
+  stopTest();
+
+  $("status").textContent =
+    "Teste interrompido.";
+});
+
+$("reset").addEventListener(
+  "click",
+  resetTest
+);
+
+$("volume").addEventListener("input", () => {
+  $("volumeValue").textContent =
+    $("volume").value + "%";
+});
+
+document.addEventListener("keydown", event => {
+  if (
+    event.key === "Enter" &&
+    running &&
+    !event.repeat
+  ) {
+    event.preventDefault();
+    markFrequency();
+  }
+});
+
+window.addEventListener(
+  "resize",
+  resizeCanvas
+);
+
+resizeCanvas();
+updateFrequency(0);
+updateButtons();
+
+requestAnimationFrame(animationLoop);
+</script>
+
+</body>
+</html>
