@@ -1,0 +1,691 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laboratório de Acústica — Ondas Sonoras</title>
+<style>
+:root{
+  --navy:#082d56;
+  --blue:#087cc2;
+  --orange:#f28b30;
+  --bg:#f2f7fb;
+  --border:#d9e5ee;
+  --muted:#64788a;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--bg);
+  color:#183044;
+  font-family:Arial,Helvetica,sans-serif;
+}
+header{
+  background:linear-gradient(110deg,#06284e,#126ca6);
+  color:white;
+  padding:24px max(20px,calc((100vw - 1250px)/2));
+}
+header h1{margin:0;font-size:29px}
+header p{margin:8px 0 0;opacity:.9}
+main{max-width:1290px;margin:24px auto;padding:0 18px}
+.card{
+  background:white;
+  border:1px solid var(--border);
+  border-radius:18px;
+  box-shadow:0 7px 22px #123b5a0b;
+  padding:22px;
+  margin-bottom:20px;
+}
+h2{margin:0 0 12px;color:var(--navy);font-size:21px}
+.description{color:var(--muted);line-height:1.55}
+.controls{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:16px;
+}
+.control{
+  padding:17px;
+  border:1px solid var(--border);
+  border-radius:13px;
+  background:#f8fbfe;
+}
+.control label{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  font-weight:bold;
+  font-size:14px;
+}
+.control output{color:var(--blue)}
+input[type=range]{
+  width:100%;
+  margin-top:19px;
+  accent-color:var(--blue);
+}
+.control small{display:block;color:var(--muted);margin-top:8px}
+.stage{
+  overflow:hidden;
+  background:#eaf5fd;
+  border:1px solid #c8dce9;
+  border-radius:15px;
+}
+canvas{display:block;width:100%;height:auto}
+.buttons{
+  display:flex;
+  justify-content:center;
+  gap:11px;
+  flex-wrap:wrap;
+  margin:19px 0 3px;
+}
+button{
+  border:0;
+  border-radius:11px;
+  padding:13px 20px;
+  font-weight:bold;
+  color:white;
+  background:var(--navy);
+  cursor:pointer;
+}
+button:hover{filter:brightness(1.12)}
+button.start{background:#188451}
+button.pause{background:#d77b17}
+button.stop{background:#bf4545}
+.legend{
+  display:flex;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:22px;
+  margin:15px 0 0;
+  font-size:13px;
+  color:#536c7f;
+}
+.dot{
+  display:inline-block;
+  width:11px;height:11px;
+  border-radius:50%;
+  margin-right:6px;
+}
+.stats{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+  margin-top:17px;
+}
+.stat{
+  background:#f2f8fc;
+  border:1px solid var(--border);
+  border-radius:12px;
+  text-align:center;
+  padding:14px;
+}
+.stat small{display:block;color:var(--muted)}
+.stat strong{display:block;color:var(--navy);font-size:22px;margin-top:6px}
+.note{
+  margin-top:14px;
+  padding:13px 16px;
+  border-left:4px solid var(--orange);
+  background:#fff8ed;
+  border-radius:9px;
+  line-height:1.5;
+}
+@media(max-width:750px){
+  .controls,.stats{grid-template-columns:1fr}
+  header h1{font-size:23px}
+  .card{padding:15px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Ondas Sonoras — Compressão e Rarefação</h1>
+  <p>Laboratório virtual de Acústica Física</p>
+</header>
+
+<main>
+  <section class="card">
+    <h2>Experimento: vibração e propagação</h2>
+    <p class="description">
+      Observe a membrana do alto-falante deslocando-se para frente
+      e para trás. As partículas do ar oscilam horizontalmente,
+      formando regiões alternadas de compressão e rarefação.
+    </p>
+
+    <div class="stage">
+      <canvas id="scene" width="1200" height="570"></canvas>
+    </div>
+
+    <div class="legend">
+      <span><i class="dot" style="background:#087cc2"></i>Partículas do ar</span>
+      <span><i class="dot" style="background:#ef8151"></i>Compressão</span>
+      <span><i class="dot" style="background:#83c4ee"></i>Rarefação</span>
+    </div>
+
+    <div class="buttons">
+      <button class="start" id="start">▶ INICIAR</button>
+      <button class="pause" id="pause">Ⅱ PAUSAR</button>
+      <button class="stop" id="stop">■ PARAR</button>
+      <button id="reset">↻ REINICIAR</button>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Controles do experimento</h2>
+
+    <div class="controls">
+      <div class="control">
+        <label for="freq">
+          Frequência
+          <output id="freqOut">440 Hz</output>
+        </label>
+        <input id="freq" type="range" min="100" max="1000"
+               step="10" value="440">
+        <small>Controla o espaçamento entre compressões.</small>
+      </div>
+
+      <div class="control">
+        <label for="amp">
+          Amplitude
+          <output id="ampOut">50%</output>
+        </label>
+        <input id="amp" type="range" min="5" max="100"
+               step="1" value="50">
+        <small>Controla o deslocamento das partículas.</small>
+      </div>
+
+      <div class="control">
+        <label for="speed">
+          Velocidade da animação
+          <output id="speedOut">1,0×</output>
+        </label>
+        <input id="speed" type="range" min="0.2" max="2.5"
+               step="0.1" value="1">
+        <small>Permite observar o movimento em câmera lenta.</small>
+      </div>
+    </div>
+
+    <div class="stats">
+      <div class="stat">
+        <small>Frequência selecionada</small>
+        <strong id="freqStat">440 Hz</strong>
+      </div>
+      <div class="stat">
+        <small>Comprimento de onda no ar</small>
+        <strong id="lambdaStat">0,78 m</strong>
+      </div>
+      <div class="stat">
+        <small>Velocidade do som adotada</small>
+        <strong>343 m/s</strong>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Variação da pressão sonora</h2>
+    <p class="description">
+      O gráfico representa a pressão acima e abaixo do valor de
+      equilíbrio, em correspondência com as regiões de compressão
+      e rarefação da animação.
+    </p>
+    <div class="stage">
+      <canvas id="graph" width="1200" height="270"></canvas>
+    </div>
+    <div class="note">
+      <strong>Observe:</strong> a perturbação avança, mas cada
+      partícula apenas oscila em torno de sua posição de equilíbrio.
+      O som transporta energia sem transportar continuamente
+      a matéria de uma extremidade à outra.
+    </div>
+  </section>
+</main>
+
+<script>
+"use strict";
+
+const scene = document.getElementById("scene");
+const ctx = scene.getContext("2d");
+const graph = document.getElementById("graph");
+const gx = graph.getContext("2d");
+
+const freq = document.getElementById("freq");
+const amp = document.getElementById("amp");
+const speed = document.getElementById("speed");
+
+const W = scene.width;
+const H = scene.height;
+
+const START_X = 190;
+const END_X = 1155;
+const CENTER_Y = 290;
+const TOP_Y = 110;
+const BOTTOM_Y = 455;
+
+const C_SOUND = 343;
+
+let running = false;
+let time = 0;
+let lastFrame = null;
+
+// A mesma fase é usada para as partículas,
+// as faixas de pressão e o gráfico.
+function params(){
+  const f = Number(freq.value);
+  const a = Number(amp.value)/100;
+  const s = Number(speed.value);
+
+  // Comprimento de onda físico, usado nos resultados.
+  const lambdaMeters = C_SOUND/f;
+
+  // Conversão didática para pixels.
+  // Frequência maior -> comprimento de onda menor.
+  const lambdaPx = 310 * (440/f);
+
+  const k = 2*Math.PI/lambdaPx;
+
+  // A fase se propaga para a direita.
+  // A velocidade visual é reduzida para observação.
+  const phaseSpeed = 125 * s;
+  const omega = k*phaseSpeed;
+
+  // Amplitude de deslocamento em pixels.
+  const A = 3 + 15*a;
+
+  return {
+    f,a,s,k,A,omega,
+    lambdaMeters,lambdaPx,
+    phaseSpeed
+  };
+}
+
+const particles = [];
+const rows = 14;
+const cols = 80;
+
+for(let i=0;i<cols;i++){
+  for(let j=0;j<rows;j++){
+    const x0 = START_X+15+i*11.8;
+    const y0 = TOP_Y+17+j*24.1;
+
+    particles.push({x0,y0});
+  }
+}
+
+// Posição da partícula:
+// ξ(x,t) = A sen(kx - ωt)
+//
+// A variação relativa de pressão é proporcional
+// a -dξ/dx = -kA cos(kx - ωt).
+//
+// Assim, regiões de maior densidade de partículas
+// coincidem com pressão acima do equilíbrio.
+function phaseAt(x,p){
+  return p.k*(x-START_X)-p.omega*time;
+}
+
+function displacement(x,p){
+  return p.A*Math.sin(phaseAt(x,p));
+}
+
+function pressure(x,p){
+  return -Math.cos(phaseAt(x,p));
+}
+
+function roundedRect(c,x,y,w,h,r){
+  c.beginPath();
+  c.roundRect(x,y,w,h,r);
+}
+
+function drawSpeaker(p){
+  const x = 100;
+  const y = CENTER_Y;
+
+  // Sombra.
+  ctx.fillStyle="rgba(4,26,45,.13)";
+  ctx.beginPath();
+  ctx.ellipse(x+12,y+94,93,14,0,0,Math.PI*2);
+  ctx.fill();
+
+  // Caixa.
+  const boxGrad=ctx.createLinearGradient(20,0,140,0);
+  boxGrad.addColorStop(0,"#152d42");
+  boxGrad.addColorStop(.55,"#425b70");
+  boxGrad.addColorStop(1,"#132a3e");
+  ctx.fillStyle=boxGrad;
+  roundedRect(ctx,20,y-94,102,188,18);
+  ctx.fill();
+
+  // Borda do alto-falante.
+  ctx.fillStyle="#071c2d";
+  ctx.beginPath();
+  ctx.ellipse(119,y,57,94,0,0,Math.PI*2);
+  ctx.fill();
+
+  ctx.strokeStyle="#7894a9";
+  ctx.lineWidth=7;
+  ctx.beginPath();
+  ctx.ellipse(119,y,50,87,0,0,Math.PI*2);
+  ctx.stroke();
+
+  // Membrana realmente oscila para frente e para trás.
+  const coneX = 123 + 8*Math.sin(-p.omega*time);
+  const grad=ctx.createLinearGradient(92,0,coneX+25,0);
+  grad.addColorStop(0,"#4e677b");
+  grad.addColorStop(.6,"#a5b7c5");
+  grad.addColorStop(1,"#253f54");
+
+  ctx.beginPath();
+  ctx.moveTo(105,y-68);
+  ctx.quadraticCurveTo(coneX+23,y-39,coneX+24,y);
+  ctx.quadraticCurveTo(coneX+23,y+39,105,y+68);
+  ctx.closePath();
+  ctx.fillStyle=grad;
+  ctx.fill();
+
+  ctx.fillStyle="#0a2032";
+  ctx.beginPath();
+  ctx.ellipse(coneX+18,y,12,25,0,0,Math.PI*2);
+  ctx.fill();
+
+  // Setas que indicam a vibração do cone.
+  ctx.strokeStyle="#ed8b39";
+  ctx.fillStyle="#ed8b39";
+  ctx.lineWidth=3;
+  const yy=y-115;
+  ctx.beginPath();
+  ctx.moveTo(99,yy);
+  ctx.lineTo(152,yy);
+  ctx.stroke();
+
+  for(const dir of [-1,1]){
+    const tip=dir===1?152:99;
+    ctx.beginPath();
+    ctx.moveTo(tip,yy);
+    ctx.lineTo(tip-dir*10,yy-6);
+    ctx.lineTo(tip-dir*10,yy+6);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  ctx.font="bold 16px Arial";
+  ctx.textAlign="center";
+  ctx.fillStyle="#173c5c";
+  ctx.fillText("FONTE SONORA",102,505);
+}
+
+function drawBackground(p){
+  const grad=ctx.createLinearGradient(0,0,0,H);
+  grad.addColorStop(0,"#e7f4fd");
+  grad.addColorStop(.55,"#f8fcff");
+  grad.addColorStop(1,"#e8f3fb");
+  ctx.fillStyle=grad;
+  ctx.fillRect(0,0,W,H);
+
+  // Canal visual da propagação.
+  ctx.fillStyle="rgba(255,255,255,.66)";
+  roundedRect(
+    ctx,START_X,TOP_Y-15,
+    END_X-START_X,BOTTOM_Y-TOP_Y+30,17
+  );
+  ctx.fill();
+
+  ctx.strokeStyle="rgba(92,144,181,.28)";
+  ctx.lineWidth=2;
+  ctx.stroke();
+
+  // Faixas de pressão calculadas pela MESMA
+  // função de fase usada nas partículas.
+  for(let x=START_X;x<END_X;x+=3){
+    const pr=pressure(x,p);
+    const intensity=Math.abs(pr)*p.a;
+    const alpha=.035+.23*intensity;
+
+    if(pr>=0){
+      ctx.fillStyle=`rgba(242,110,70,${alpha})`;
+    }else{
+      ctx.fillStyle=`rgba(63,163,226,${alpha})`;
+    }
+    ctx.fillRect(x,TOP_Y-13,3,BOTTOM_Y-TOP_Y+26);
+  }
+
+  // Linhas discretas de referência.
+  ctx.strokeStyle="rgba(56,112,152,.09)";
+  ctx.lineWidth=1;
+  for(let y=TOP_Y+15;y<BOTTOM_Y;y+=24.1){
+    ctx.beginPath();
+    ctx.moveTo(START_X,y);
+    ctx.lineTo(END_X,y);
+    ctx.stroke();
+  }
+}
+
+function drawParticles(p){
+  // Posição de equilíbrio e posição instantânea.
+  for(const part of particles){
+    const dx=displacement(part.x0,p);
+    const x=part.x0+dx;
+    const y=part.y0;
+
+    // Partícula azul com leve brilho.
+    ctx.beginPath();
+    ctx.arc(x,y,3.35,0,Math.PI*2);
+    ctx.fillStyle="#087cc2";
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.arc(x-1,y-1,1.05,0,Math.PI*2);
+    ctx.fillStyle="rgba(255,255,255,.8)";
+    ctx.fill();
+  }
+}
+
+function drawLabels(p){
+  ctx.textAlign="center";
+  ctx.font="bold 16px Arial";
+
+  // Busca o centro de uma compressão e de
+  // uma rarefação visíveis.
+  let compressionX=null;
+  let rarefactionX=null;
+  let bestC=-Infinity;
+  let bestR=Infinity;
+
+  for(let x=350;x<1000;x+=2){
+    const pr=pressure(x,p);
+    if(pr>bestC){
+      bestC=pr;
+      compressionX=x;
+    }
+    if(pr<bestR){
+      bestR=pr;
+      rarefactionX=x;
+    }
+  }
+
+  function tag(x,text,color){
+    const w=text==="COMPRESSÃO"?148:143;
+    ctx.fillStyle="rgba(255,255,255,.95)";
+    ctx.strokeStyle=color;
+    ctx.lineWidth=2;
+    roundedRect(ctx,x-w/2,42,w,39,10);
+    ctx.fill();
+    ctx.stroke();
+    ctx.fillStyle=color;
+    ctx.fillText(text,x,67);
+
+    ctx.beginPath();
+    ctx.moveTo(x,81);
+    ctx.lineTo(x,TOP_Y-20);
+    ctx.stroke();
+  }
+
+  if(compressionX!==null)
+    tag(compressionX,"COMPRESSÃO","#cf5737");
+
+  if(rarefactionX!==null &&
+     Math.abs(rarefactionX-compressionX)>145)
+    tag(rarefactionX,"RAREFAÇÃO","#187fb5");
+
+  // Seta da propagação.
+  ctx.strokeStyle="#145f9c";
+  ctx.fillStyle="#145f9c";
+  ctx.lineWidth=3;
+  ctx.beginPath();
+  ctx.moveTo(420,475);
+  ctx.lineTo(825,475);
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.moveTo(825,475);
+  ctx.lineTo(812,467);
+  ctx.lineTo(812,483);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.font="bold 15px Arial";
+  ctx.fillText("PROPAGAÇÃO DA ONDA",623,464);
+
+  ctx.fillStyle="#567487";
+  ctx.font="14px Arial";
+  ctx.fillText(
+    "As partículas vibram horizontalmente",
+    680,525
+  );
+}
+
+function drawScene(){
+  const p=params();
+  ctx.clearRect(0,0,W,H);
+  drawBackground(p);
+  drawParticles(p);
+  drawSpeaker(p);
+  drawLabels(p);
+}
+
+function drawGraph(){
+  const p=params();
+  const w=graph.width;
+  const h=graph.height;
+
+  gx.fillStyle="#fff";
+  gx.fillRect(0,0,w,h);
+
+  const left=95,right=40,top=38,bottom=55;
+  const plotW=w-left-right;
+  const mid=top+(h-top-bottom)/2;
+  const height=65;
+
+  gx.strokeStyle="#dbe6ee";
+  gx.lineWidth=1;
+  for(let i=0;i<=4;i++){
+    const y=top+i*(h-top-bottom)/4;
+    gx.beginPath();
+    gx.moveTo(left,y);
+    gx.lineTo(w-right,y);
+    gx.stroke();
+  }
+
+  gx.strokeStyle="#647f92";
+  gx.lineWidth=1.5;
+  gx.beginPath();
+  gx.moveTo(left,mid);
+  gx.lineTo(w-right,mid);
+  gx.stroke();
+
+  gx.beginPath();
+  gx.moveTo(left,top);
+  gx.lineTo(left,h-bottom);
+  gx.stroke();
+
+  // O gráfico usa exatamente a mesma fase
+  // que determina compressões e rarefações.
+  gx.beginPath();
+  for(let n=0;n<=800;n++){
+    const screenX=START_X+
+      (END_X-START_X)*n/800;
+    const x=left+plotW*n/800;
+    const y=mid-pressure(screenX,p)*height*p.a;
+
+    if(n===0)gx.moveTo(x,y);
+    else gx.lineTo(x,y);
+  }
+  gx.lineWidth=4;
+  gx.strokeStyle="#087cc2";
+  gx.stroke();
+
+  gx.font="bold 15px Arial";
+  gx.fillStyle="#173c5c";
+  gx.textAlign="left";
+  gx.fillText("Pressão relativa",left+8,25);
+  gx.fillText("Posição →",w-150,h-16);
+
+  gx.fillStyle="#cb6447";
+  gx.font="13px Arial";
+  gx.fillText("Compressão (+)",left+10,top+18);
+
+  gx.fillStyle="#2185b7";
+  gx.fillText("Rarefação (−)",left+10,h-bottom-10);
+}
+
+function refresh(){
+  const p=params();
+  document.getElementById("freqOut").textContent=
+    `${p.f} Hz`;
+  document.getElementById("ampOut").textContent=
+    `${Math.round(p.a*100)}%`;
+  document.getElementById("speedOut").textContent=
+    `${p.s.toFixed(1).replace(".",",")}×`;
+
+  document.getElementById("freqStat").textContent=
+    `${p.f} Hz`;
+  document.getElementById("lambdaStat").textContent=
+    `${p.lambdaMeters.toFixed(2).replace(".",",")} m`;
+
+  drawScene();
+  drawGraph();
+}
+
+function animate(timestamp){
+  if(lastFrame===null)lastFrame=timestamp;
+  const dt=Math.min((timestamp-lastFrame)/1000,.05);
+  lastFrame=timestamp;
+
+  if(running){
+    // O fator velocidade já está em omega.
+    time+=dt;
+  }
+
+  drawScene();
+  drawGraph();
+  requestAnimationFrame(animate);
+}
+
+document.getElementById("start").onclick=()=>{
+  running=true;
+};
+document.getElementById("pause").onclick=()=>{
+  running=false;
+};
+document.getElementById("stop").onclick=()=>{
+  running=false;
+  time=0;
+  refresh();
+};
+document.getElementById("reset").onclick=()=>{
+  running=false;
+  time=0;
+  freq.value=440;
+  amp.value=50;
+  speed.value=1;
+  refresh();
+};
+
+[freq,amp,speed].forEach(el=>
+  el.addEventListener("input",refresh)
+);
+
+refresh();
+requestAnimationFrame(animate);
+</script>
+</body>
+</html>
